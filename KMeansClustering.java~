@@ -1,0 +1,43 @@
+/* 
+ * File: KMeansClustering.java
+ */
+
+import java.util.*;
+import java.io.*;
+
+public class KMeansClustering {
+  
+  public static ArrayList<Data> processData(String fileName) throws IOException{
+    BufferedReader file;
+    ArrayList<String> attributeNames = new ArrayList<String>();
+    String[] firstClass;
+    //Validate file
+    try {
+      file = new BufferedReader(new FileReader(fileName));
+    }
+    catch (FileNotFoundException e) {
+      return null;
+    }
+    
+    String line = file.readLine();
+    while (line != null) {
+      if (line.equals("")) continue;
+      String[] lineArgs = line.split(" ", 2);
+      if (lineArgs[0].equals("@relation")) continue;
+      if (lineArgs[0].equals("@attribute") && !lineArgs[1].equals("Class")) {
+        attributeNames.add(lineArgs[1]);
+      }
+      else {
+        firstClass = lineArgs[2].split("\\s+|,+|{|}
+    }
+  }
+  
+  public static void main(String[] args) {
+    ArrayList<Data> trainingData = processData(args[0]);
+    if (trainingData == null) {System.out.println("Invalid training file."); return;}
+    ArrayList<Data> testingData = processData(args[1]);
+    if (testingData == null) {System.out.println("Invalid testing file."); return;}
+    
+    
+  }
+}
