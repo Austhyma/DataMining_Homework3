@@ -41,7 +41,6 @@ public class KMeansClustering {
         String attribute = attributeNames.get(i);
         if (attribute.equals("Class")) {
           classLabel = dataValues[i];
-          line = file.readLine();
           continue;
         }
         double value;
@@ -69,10 +68,6 @@ public class KMeansClustering {
     if (testingData == null) {System.out.println("Invalid testing file."); return;}
     
     ArrayList<Data> allData = new ArrayList<Data>(trainingData);
-    System.out.println("Initial " + allData.size());
     allData.addAll(testingData);
-    System.out.println("Final " + allData.size());
-    System.out.println("Actual " + (trainingData.size() + testingData.size()));
-    
   }
 }

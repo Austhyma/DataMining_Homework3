@@ -15,4 +15,5 @@ public class Data {
   }
   
   public String getClassLabel() {return classLabel;}
+  public HashMap<String, Double> getDimensions() {return this.dimensions;}
 }
