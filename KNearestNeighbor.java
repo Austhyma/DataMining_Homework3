@@ -67,6 +67,7 @@ public class KNearestNeighbor {
     if (trainingData == null) {System.out.println("Invalid training file."); return;}
     ArrayList<Data> initialTestingData = processData(args[1], true);
     if (initialTestingData == null) {System.out.println("Invalid testing file."); return;}
+    System.out.println("Finished Reading Files");
     
     ArrayList<TestingData> testingData = new ArrayList<TestingData>();
     for (Iterator<Data> testObj = initialTestingData.iterator(); testObj.hasNext();) {
@@ -74,5 +75,6 @@ public class KNearestNeighbor {
       current.computeDistances(trainingData, trainingData.size());
       testingData.add(current);
     }
+    System.out.println("Finished Computing Distances");
   }
 }

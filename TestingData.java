@@ -26,19 +26,22 @@ public class TestingData extends Data {
     
     int i = 0;
     for (Iterator<Data> curTrain = trainingData.iterator(); curTrain.hasNext();) {
-      euclideans.put(i, setEuclideans(curTrain.next().getAttributes()));
+      setEuclideansManhattans(curTrain.next().getAttributes(), i);
       i++;
     }
   }
   
-  public double setEuclideans(HashMap<String, Double> trainingData) {
-    int count = 0;
-    double total = 0;
+  public void setEuclideansManhattans(HashMap<String, Double> trainingData, int index) {
+    double etotal = 0;
+    double mtotal = 0;
     Set<String> attNames = this.attributes.keySet();
     for (Iterator<String> att = attNames.iterator(); att.hasNext();) {
       String currentAtt = att.next();
-      total += Math.pow(this.attributes.get(currentAtt) - trainingData.get(currentAtt), 2);
+      double manhattan = this.attributes.get(currentAtt) - trainingData.get(currentAtt);
+      mtotal += manhattan;
+      etotal += Math.pow(manhattan, 2);
     }
-    return total;
+    euclideans.put(index, Math.sqrt(etotal));
+    manhattans.put(index, mtotal);
   }
 }
