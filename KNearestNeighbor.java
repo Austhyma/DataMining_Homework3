@@ -1,13 +1,13 @@
 /* 
- * File: KMeansClustering.java
+ * File: KNearestNeighbor.java
  */
 
 import java.util.*;
 import java.io.*;
 
-public class KMeansClustering {
+public class KNearestNeighbor {
   
-  public static ArrayList<Data> processData(String fileName) throws IOException{
+  public static ArrayList<Data> processData(String fileName, boolean test) throws IOException{
     
     BufferedReader file;
     ArrayList<String> attributeNames = new ArrayList<String>();
@@ -53,7 +53,8 @@ public class KMeansClustering {
         }
         objects.put(attribute, value);
       }
-      allData.add(new Data(objects, classLabel));
+      if (!test) allData.add(new Data(objects, classLabel));
+      else allData.add(new TestingData(objects, classLabel));
       line = file.readLine();
     }
     return allData;
@@ -62,12 +63,16 @@ public class KMeansClustering {
   public static void main(String[] args) throws IOException {
     
     //Reads/processes training/testing files
-    ArrayList<Data> trainingData = processData(args[0]);
+    ArrayList<Data> trainingData = processData(args[0], false);
     if (trainingData == null) {System.out.println("Invalid training file."); return;}
-    ArrayList<Data> testingData = processData(args[1]);
-    if (testingData == null) {System.out.println("Invalid testing file."); return;}
+    ArrayList<Data> initialTestingData = processData(args[1], true);
+    if (initialTestingData == null) {System.out.println("Invalid testing file."); return;}
     
-    ArrayList<Data> allData = new ArrayList<Data>(trainingData);
-    allData.addAll(testingData);
+    ArrayList<TestingData> testingData = new ArrayList<TestingData>();
+    for (Iterator<Data> testObj = initialTestingData.iterator(); testObj.hasNext();) {
+      TestingData current = (TestingData) testObj.next();
+      current.computeDistances(trainingData, trainingData.size());
+      testingData.add(current);
+    }
   }
 }

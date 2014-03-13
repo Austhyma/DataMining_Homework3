@@ -1,8 +1,8 @@
 /*
- * File: Distance.java
+ * File: TrainingData.java
  */
 
-public class Distance {
+public class TrainingData extends Data {
   
   private double euclidean;
   private double chebyshev;
