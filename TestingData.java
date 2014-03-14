@@ -5,33 +5,46 @@ import java.util.*;
 
 public class TestingData extends Data {
   
-  private String predictedClassLabel;
+  private String predictedEuclideanClass;
+  private String predictedManhattanClass;
+  private String predictedChebyshevClass;
+  private String predictedCosineClass;
   private HashMap<Integer, Double> euclideans;
   private HashMap<Integer, Double> chebyshevs;
   private HashMap<Integer, Double> manhattans;
   private HashMap<Integer, Double> cosines;
+  private int arraysize;
   
-  public TestingData(HashMap<String, Double> attributes, String classLabel) {
-    super(attributes, classLabel);
+  public TestingData(HashMap<String, Double> attributes, String classLabel, int iD) {
+    super(attributes, classLabel, iD);
   }
   
-  public void setPrediction(String classLabel) {this.predictedClassLabel = classLabel;}
+  public void setEuclideanPrediction(String classLabel) {this.predictedEuclideanClass = classLabel;}
+  public void setManhattanPrediction(String classLabel) {this.predictedManhattanClass = classLabel;}
+  public void setChebyshevPrediction(String classLabel) {this.predictedChebyshevClass = classLabel;}
+  public void setCosinePrediction(String classLabel) {this.predictedCosineClass = classLabel;}
   public String getPrediction() {return predictedClassLabel;}
+  public int arraysize() {return arraysize;}
+  public double getEuclidean(int index) {return this.euclideans.get(index);}
+  public double getManhattan(int index) {return this.manhattans.get(index);}
+  public double getChebyshev(int index) {return this.chebyshevs.get(index);}
+  public double getCosine(int index) {return this.cosines.get(index);}
+  public void setArraySize(int size) {this.arraysize = size;}
   
   public void computeDistances(ArrayList<Data> trainingData, int size) {
     this.euclideans = new HashMap<Integer, Double>(size);
     this.chebyshevs = new HashMap<Integer, Double>(size);
     this.manhattans = new HashMap<Integer, Double>(size);
     this.cosines = new HashMap<Integer, Double>(size);
+    this.arraysize = size;
     
-    int i = 0;
     for (Iterator<Data> curTrain = trainingData.iterator(); curTrain.hasNext();) {
-      setEuclideansManhattans(curTrain.next().getAttributes(), i);
-      i++;
+      Data current = curTrain.next();
+      computeAll(current.getAttributes(), current.getID());
     }
   }
   
-  public void setEuclideansManhattans(HashMap<String, Double> trainingData, int index) {
+  public void computeAll(HashMap<String, Double> trainingData, int index) {
     double etotal = 0;
     double mtotal = 0;
     double chebyshev = 0; //Can't think of a better way at this moment
@@ -68,26 +81,26 @@ public class TestingData extends Data {
     attribute.put("x", 8.0);
     attribute.put("y", 4.0);
     attribute.put("z", 4.0);
-    Data newData = new Data(attribute, "blah");
+    Data newData = new Data(attribute, "blah", 0);
     trainingData.add(newData);
     attribute = new HashMap<String, Double>();
     attribute.put("x", 2.0);
     attribute.put("y", 1.0);
     attribute.put("z", 6.0);
-    Data newData1 = new Data(attribute, "blah");
+    Data newData1 = new Data(attribute, "blah", 0);
     trainingData.add(newData1);
     attribute = new HashMap<String, Double>();
     attribute.put("x", 1.0);
     attribute.put("y", 2.0);
     attribute.put("z", 3.0);
-    Data newData2 = new Data(attribute, "blah");
+    Data newData2 = new Data(attribute, "blah", 0);
     trainingData.add(newData1);
     
     attribute = new HashMap<String, Double>();
     attribute.put("x", 1.0);
     attribute.put("y", 1.0);
     attribute.put("z", 2.0);
-    TestingData test = new TestingData(attribute, "blah");
+    TestingData test = new TestingData(attribute, "blah", 0);
     
     test.computeDistances(trainingData, trainingData.size());
     System.out.println("Manhattans = " + test.getManhattans().toString());

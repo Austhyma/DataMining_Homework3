@@ -1,5 +1,5 @@
 /* 
- * File: KMeansClustering.java
+ * File: KNearestNeighbor.java
  */
 
 import java.util.*;
@@ -65,9 +65,16 @@ public class KNearestNeighbor {
     //Reads/processes training/testing files
     ArrayList<Data> trainingData = processData(args[0], false);
     if (trainingData == null) {System.out.println("Invalid training file."); return;}
-    ArrayList<Data> testingData = processData(args[1], true);
-    if (testingData == null) {System.out.println("Invalid testing file."); return;}
+    ArrayList<Data> initialTestingData = processData(args[1], true);
+    if (initialTestingData == null) {System.out.println("Invalid testing file."); return;}
+    System.out.println("Finished Reading Files");
     
-    
+    ArrayList<TestingData> testingData = new ArrayList<TestingData>();
+    for (Iterator<Data> testObj = initialTestingData.iterator(); testObj.hasNext();) {
+      TestingData current = (TestingData) testObj.next();
+      current.computeDistances(trainingData, trainingData.size());
+      testingData.add(current);
+    }
+    System.out.println("Finished Computing Distances");
   }
 }
