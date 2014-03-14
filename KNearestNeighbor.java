@@ -63,43 +63,57 @@ public class KNearestNeighbor {
   
   public static ArrayList<TestingData> kNearestNeighbor(ArrayList<TestingData> testingData, ArrayList<Data> trainingData, int k) {
     for (int i = 0; i < testingData.size(); i++) {
-      int[] smallestE = new int[k];
-      int[] smallestM = new int[k];
-      int[] smallestC = new int[k];
-      int[] smallestCosine = new int[k];
+      //System.out.println(i);
       TestingData current = testingData.get(i);
-      for (int j = 0; j < k; j++) {
-        int smallE = 0;
-        int smallM = 0;
-        int smallC = 0;
-        int smallCosine = 0;
-        for (int l = 1; l < current.arraysize(); l++) {
-          if (current.getEuclidean(l) < current.getEuclidean(smallE)) smallE = l;
-          if (current.getManhattan(l) < current.getManhattan(smallM)) smallM = l;
-          if (current.getChebyshev(l) < current.getChebyshev(smallC)) smallC = l;
-          if (current.getCosine(l) < current.getCosine(smallCosine)) smallCosine = l;
-        }
-        smallestE[j] = smallE;
-        smallestM[j] = smallM;
-        smallestC[j] = smallC;
-        smallestCosine[j] = smallCosine;
-        current.getEuclideans().remove(smallE);
-        current.getManhattans().remove(smallM);
-        current.getChebyshevs().remove(smallC);
-        current.getCosines().remove(smallCosine);
-        current.setArraySize(current.arraysize()-1);
-        
-      }
-      String smallEClass = "";
-      for (int m = 0; m < k; m++) {
-        for (int n = 0; n < trainingData.size(); n++) {
-          if (trainingData.get(n).getID() == smallestE[m]) {
-            if (m == 0) smallEClass = "
-            smallEClass = trainingData.get(m).getClassLabel
+      HashMap<Integer, Double> smallestEuclideans = getSmallest(current.getEuclideans(), k);
+      HashMap<Integer, Double> smallestManhattans = getSmallest(current.getManhattans(), k);
+      HashMap<Integer, Double> smallestChebyshevs = getSmallest(current.getChebyshevs(), k);
+      HashMap<Integer, Double> smallestCosines = getSmallest(current.getCosines(), k);
+      current.setEuclideanPrediction(vote(smallestEuclideans, trainingData));
+      current.setManhattanPrediction(vote(smallestManhattans, trainingData));
+      current.setChebyshevPrediction(vote(smallestChebyshevs, trainingData));
+      current.setCosinePrediction(vote(smallestCosines, trainingData));
     }
     return testingData;
   }
+  
+  public static HashMap<Integer, Double> getSmallest(HashMap<Integer, Double> currentVals, int k) {
+    HashMap<Integer, Double> returnVals = new HashMap<Integer, Double>();
+    for (int i = 0; i < k; i++) {
+      //System.out.println(i);
+      int small = 0;
+      double smallValue = 0.0;
+      for (int j = 1; j < currentVals.size(); j++) {
+        //System.out.println(j);
+        //System.out.println(!returnVals.containsKey(j));
+        if (!returnVals.containsKey(j)) continue;
+        if (currentVals.get(j) < currentVals.get(small)) {small = j; smallValue = currentVals.get(j);}
+      }
+      returnVals.put(small, smallValue);
+      //System.out.println(returnVals.toString());
+      //System.out.println(returnVals.containsKey(small));
+      currentVals.remove(small);
+    }
+    return returnVals;
+  }
     
+    
+  public static String vote(HashMap<Integer, Double> smallestValues, ArrayList<Data> tData) {
+    String classLabel1 = "";
+    String classLabel2 = "";
+    double yesVotes = 0;
+    double noVotes = 0;
+    for (int m = 0; m < smallestValues.size(); m++) {
+      for (int n = 0; n < tData.size(); n++) {
+        if (tData.get(n).getID() == smallestValues.get(m)) {
+          if (m == 0) {classLabel1 = tData.get(n).getClassLabel(); yesVotes += (1/Math.pow(smallestValues.get(m), 2));}
+          else if (tData.get(n).getClassLabel().equals(classLabel1)) yesVotes += (1/Math.pow(smallestValues.get(m), 2));
+          else {classLabel2 = tData.get(n).getClassLabel(); noVotes += (1/Math.pow(smallestValues.get(m), 2));}
+        }
+      }
+    }
+    return (yesVotes > noVotes) ? classLabel1 : classLabel2;
+  }
   
   public static void main(String[] args) throws IOException {
     
@@ -119,10 +133,19 @@ public class KNearestNeighbor {
     }
     System.out.println("Finished Computing Distances");
     
-    ArrayList<TestingData> k3 = kNearestNeighbor(testingData, 3);
-    ArrayList<TestingData> k5 = kNearestNeighbor(testingData, 5);
-    ArrayList<TestingData> k7 = kNearestNeighbor(testingData, 7);
-    ArrayList<TestingData> k9 = kNearestNeighbor(testingData, 9);
-    ArrayList<TestingData> k11 = kNearestNeighbor(testingData, 11);
+    ArrayList<TestingData> k3 = kNearestNeighbor(testingData, trainingData, 3);
+    ArrayList<TestingData> k5 = kNearestNeighbor(testingData, trainingData, 5);
+    ArrayList<TestingData> k7 = kNearestNeighbor(testingData, trainingData, 7);
+    ArrayList<TestingData> k9 = kNearestNeighbor(testingData, trainingData, 9);
+    ArrayList<TestingData> k11 = kNearestNeighbor(testingData, trainingData, 11);
+    System.out.println("Predictions Made");
+    
+    String[] classLabels = new String[2];
+    classLabels[0] = trainingData.get(0).getClassLabel();
+    for (int i = 1; i < trainingData.size(); i++) {
+      if (!trainingData.get(i).getClassLabel().equals(classLabels[0])) {classLabels[1] = trainingData.get(i).getClassLabel(); break;}
+    }
+    System.out.println(classLabels[0]);
+    System.out.println(classLabels[1]);
   }
 }

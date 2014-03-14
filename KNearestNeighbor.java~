@@ -11,7 +11,6 @@ public class KNearestNeighbor {
     
     BufferedReader file;
     ArrayList<String> attributeNames = new ArrayList<String>();
-    String[] firstClass;
     //Validate file
     try {
       file = new BufferedReader(new FileReader(fileName));
@@ -33,6 +32,7 @@ public class KNearestNeighbor {
     
     ArrayList<Data> allData = new ArrayList<Data>();
     line = file.readLine();
+    int iD = 0;
     while (line != null) {
       HashMap<String, Double> objects = new HashMap<String, Double>();
       String[] dataValues = line.split(",");
@@ -53,12 +53,53 @@ public class KNearestNeighbor {
         }
         objects.put(attribute, value);
       }
-      if (!test) allData.add(new Data(objects, classLabel));
-      else allData.add(new TestingData(objects, classLabel));
+      if (!test) allData.add(new Data(objects, classLabel, iD));
+      else allData.add(new TestingData(objects, classLabel, iD));
+      iD++;
       line = file.readLine();
     }
     return allData;
   }
+  
+  public static ArrayList<TestingData> kNearestNeighbor(ArrayList<TestingData> testingData, ArrayList<Data> trainingData, int k) {
+    for (int i = 0; i < testingData.size(); i++) {
+      int[] smallestE = new int[k];
+      int[] smallestM = new int[k];
+      int[] smallestC = new int[k];
+      int[] smallestCosine = new int[k];
+      TestingData current = testingData.get(i);
+      for (int j = 0; j < k; j++) {
+        int smallE = 0;
+        int smallM = 0;
+        int smallC = 0;
+        int smallCosine = 0;
+        for (int l = 1; l < current.arraysize(); l++) {
+          if (current.getEuclidean(l) < current.getEuclidean(smallE)) smallE = l;
+          if (current.getManhattan(l) < current.getManhattan(smallM)) smallM = l;
+          if (current.getChebyshev(l) < current.getChebyshev(smallC)) smallC = l;
+          if (current.getCosine(l) < current.getCosine(smallCosine)) smallCosine = l;
+        }
+        smallestE[j] = smallE;
+        smallestM[j] = smallM;
+        smallestC[j] = smallC;
+        smallestCosine[j] = smallCosine;
+        current.getEuclideans().remove(smallE);
+        current.getManhattans().remove(smallM);
+        current.getChebyshevs().remove(smallC);
+        current.getCosines().remove(smallCosine);
+        current.setArraySize(current.arraysize()-1);
+        
+      }
+      String smallEClass = "";
+      for (int m = 0; m < k; m++) {
+        for (int n = 0; n < trainingData.size(); n++) {
+          if (trainingData.get(n).getID() == smallestE[m]) {
+            if (m == 0) smallEClass = "
+            smallEClass = trainingData.get(m).getClassLabel
+    }
+    return testingData;
+  }
+    
   
   public static void main(String[] args) throws IOException {
     
@@ -69,6 +110,7 @@ public class KNearestNeighbor {
     if (initialTestingData == null) {System.out.println("Invalid testing file."); return;}
     System.out.println("Finished Reading Files");
     
+    //Compute distances
     ArrayList<TestingData> testingData = new ArrayList<TestingData>();
     for (Iterator<Data> testObj = initialTestingData.iterator(); testObj.hasNext();) {
       TestingData current = (TestingData) testObj.next();
@@ -76,5 +118,11 @@ public class KNearestNeighbor {
       testingData.add(current);
     }
     System.out.println("Finished Computing Distances");
+    
+    ArrayList<TestingData> k3 = kNearestNeighbor(testingData, 3);
+    ArrayList<TestingData> k5 = kNearestNeighbor(testingData, 5);
+    ArrayList<TestingData> k7 = kNearestNeighbor(testingData, 7);
+    ArrayList<TestingData> k9 = kNearestNeighbor(testingData, 9);
+    ArrayList<TestingData> k11 = kNearestNeighbor(testingData, 11);
   }
 }

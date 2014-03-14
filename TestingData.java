@@ -23,7 +23,6 @@ public class TestingData extends Data {
   public void setManhattanPrediction(String classLabel) {this.predictedManhattanClass = classLabel;}
   public void setChebyshevPrediction(String classLabel) {this.predictedChebyshevClass = classLabel;}
   public void setCosinePrediction(String classLabel) {this.predictedCosineClass = classLabel;}
-  public String getPrediction() {return predictedClassLabel;}
   public int arraysize() {return arraysize;}
   public double getEuclidean(int index) {return this.euclideans.get(index);}
   public double getManhattan(int index) {return this.manhattans.get(index);}
