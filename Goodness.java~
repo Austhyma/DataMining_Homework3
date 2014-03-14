@@ -1,0 +1,13 @@
+public class Goodness {
+  
+  private int truePositive;
+  private int falsePositive;
+  private int trueNegative;
+  private int falseNegative;
+  
+  public Goodness(int truePositive, int falsePositive, int trueNegative, int falseNegative) {
+    this.truePositive = truePositive;
+    this.falsePositive = falsePositive;
+    this.trueNegative = trueNegative;
+    this.falseNegative = falseNegative;
+  }

@@ -115,6 +115,49 @@ public class KNearestNeighbor {
     return (yesVotes > noVotes) ? classLabel1 : classLabel2;
   }
   
+  public static ArrayList<Goodness> confusionMatrix(ArrayList<TestingData> testingData, String classLabel) {
+    ArrayList<Goodness> returnVals = new ArrayList<Goodness>();
+    returnVals.add(getConfusionMatrix(testingData, classLabel, 0));
+    returnVals.add(getConfusionMatrix(testingData, classLabel, 1));
+    returnVals.add(getConfusionMatrix(testingData, classLabel, 2));
+    returnVals.add(getConfusionMatrix(testingData, classLabel, 3));
+    
+    return returnVals;
+  }
+  
+  public static Goodness getConfusionMatrix(ArrayList<TestingData> testingData, String classLabel, int index) {
+    int truePositive = 0;
+    int falseNegative = 0;
+    int trueNegative = 0;
+    int falsePositive = 0;
+    for (int i = 0; i < testingData.size(); i++) {
+      TestingData current = testingData.get(i);
+      switch (index) {
+        case 0: if (current.getPredictedEuclidean().equals(classLabel) && current.getPredictedEuclidean().equals(classLabel)) truePositive++;
+        else if (current.getPredictedEuclidean().equals(classLabel) && !current.getPredictedEuclidean().equals(classLabel)) falsePositive++;
+        else if (!current.getPredictedEuclidean().equals(classLabel) && !current.getPredictedEuclidean().equals(classLabel)) trueNegative++;
+        else if (!current.getPredictedEuclidean().equals(classLabel) && current.getPredictedEuclidean().equals(classLabel)) falseNegative++;
+        break;
+        case 1: if (current.getPredictedManhattan().equals(classLabel) && current.getPredictedManhattan().equals(classLabel)) truePositive++;
+        else if (current.getPredictedManhattan().equals(classLabel) && !current.getPredictedManhattan().equals(classLabel)) falsePositive++;
+        else if (!current.getPredictedManhattan().equals(classLabel) && !current.getPredictedManhattan().equals(classLabel)) trueNegative++;
+        else if (!current.getPredictedManhattan().equals(classLabel) && current.getPredictedManhattan().equals(classLabel)) falseNegative++;
+        break;
+        case 2: if (current.getPredictedChebyshev().equals(classLabel) && current.getPredictedChebyshev().equals(classLabel)) truePositive++;
+        else if (current.getPredictedChebyshev().equals(classLabel) && !current.getPredictedChebyshev().equals(classLabel)) falsePositive++;
+        else if (!current.getPredictedChebyshev().equals(classLabel) && !current.getPredictedChebyshev().equals(classLabel)) trueNegative++;
+        else if (!current.getPredictedChebyshev().equals(classLabel) && current.getPredictedChebyshev().equals(classLabel)) falseNegative++;
+        break;
+        case 3: if (current.getPredictedCosine().equals(classLabel) && current.getPredictedCosine().equals(classLabel)) truePositive++;
+        else if (current.getPredictedCosine().equals(classLabel) && !current.getPredictedCosine().equals(classLabel)) falsePositive++;
+        else if (!current.getPredictedCosine().equals(classLabel) && !current.getPredictedCosine().equals(classLabel)) trueNegative++;
+        else if (!current.getPredictedCosine().equals(classLabel) && current.getPredictedCosine().equals(classLabel)) falseNegative++;
+        break;
+      }
+    }
+    return new Goodness(truePositive, falsePositive, trueNegative, falseNegative);
+  }
+  
   public static void main(String[] args) throws IOException {
     
     //Reads/processes training/testing files
@@ -145,7 +188,15 @@ public class KNearestNeighbor {
     for (int i = 1; i < trainingData.size(); i++) {
       if (!trainingData.get(i).getClassLabel().equals(classLabels[0])) {classLabels[1] = trainingData.get(i).getClassLabel(); break;}
     }
-    System.out.println(classLabels[0]);
-    System.out.println(classLabels[1]);
+    ArrayList<Goodness> k3_1_Values = confusionMatrix(k3, classLabels[0]);
+    ArrayList<Goodness> k3_2_Values = confusionMatrix(k3, classLabels[1]);
+    ArrayList<Goodness> k5_1_Values = confusionMatrix(k5, classLabels[0]);
+    ArrayList<Goodness> k5_2_Values = confusionMatrix(k5, classLabels[1]);
+    ArrayList<Goodness> k7_1_Values = confusionMatrix(k7, classLabels[0]);
+    ArrayList<Goodness> k7_2_Values = confusionMatrix(k7, classLabels[1]);
+    ArrayList<Goodness> k9_1_Values = confusionMatrix(k9, classLabels[0]);
+    ArrayList<Goodness> k9_2_Values = confusionMatrix(k9, classLabels[1]);
+    ArrayList<Goodness> k11_1_Values = confusionMatrix(k11, classLabels[0]);
+    ArrayList<Goodness> k11_2_Values = confusionMatrix(k11, classLabels[1]);
   }
 }
