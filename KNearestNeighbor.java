@@ -82,14 +82,18 @@ public class KNearestNeighbor {
   public static HashMap<Integer, Double> getSmallest(HashMap<Integer, Double> currentVals, int k) {
     HashMap<Integer, Double> returnVals = new HashMap<Integer, Double>();
     for (int i = 0; i < k; i++) {
-      int small = 0;
-      double smallValue = 0.0;
+      int smallIndex;
+      if (!returnVals.containsKey(0)) smallIndex = 0;
+      else smallIndex = 1;
+      double smallValue = currentVals.get(smallIndex);
       for (int j = 1; j < currentVals.size(); j++) {
-        if (!returnVals.containsKey(j)) continue;
-        if (currentVals.get(j) < currentVals.get(small)) {small = j; smallValue = currentVals.get(j);}
+        if (returnVals.containsKey(j)) continue;
+        if (currentVals.get(j) < currentVals.get(smallIndex)) {
+          smallIndex = j; 
+          smallValue = currentVals.get(j);
+        }
       }
-      returnVals.put(small, smallValue);
-      currentVals.remove(small);
+      returnVals.put(smallIndex, smallValue);
     }
     return returnVals;
   }
@@ -100,19 +104,29 @@ public class KNearestNeighbor {
     String classLabel2 = "";
     double yesVotes = 0;
     double noVotes = 0;
-    for (int m = 0; m < smallestValues.size(); m++) {
+    Set<Integer> keys = smallestValues.keySet();
+    for (Iterator<Integer> key = keys.iterator(); key.hasNext();) {
+      int currentKey = key.next();
       for (int n = 0; n < tData.size(); n++) {
-        if (tData.get(n).getID() == smallestValues.get(m)) {
-          if (m == 0) {classLabel1 = tData.get(n).getClassLabel(); yesVotes += (1/Math.pow(smallestValues.get(m), 2));}
-          else if (tData.get(n).getClassLabel().equals(classLabel1)) yesVotes += (1/Math.pow(smallestValues.get(m), 2));
-          else {classLabel2 = tData.get(n).getClassLabel(); noVotes += (1/Math.pow(smallestValues.get(m), 2));}
+        if (tData.get(n).getID() == smallestValues.get(currentKey)) {
+          if (classLabel1.equals("")) {
+            classLabel1 = tData.get(n).getClassLabel(); 
+          }
+          if (tData.get(n).getClassLabel().equals(classLabel1)) yesVotes += (1/Math.pow(smallestValues.get(currentKey), 2));
+          else {
+            classLabel2 = tData.get(n).getClassLabel(); 
+            noVotes += (1/Math.pow(smallestValues.get(currentKey), 2));
+          }
         }
       }
     }
+    System.out.println(classLabel1);
+    System.out.println(classLabel2);
+    //System.out.println("yesVotes: " + yesVotes);
+    //System.out.println("noVotes: " + noVotes);
     return (yesVotes > noVotes) ? classLabel1 : classLabel2;
   }
   
-  //
   public static HashMap<String, HashMap<String, Goodness>> getGoodness(ArrayList<TestingData> testingData, String[] classLabel) {
     HashMap<String, HashMap<String, Goodness>> returnVals = new HashMap<String, HashMap<String, Goodness>>();
     for (int i = 0; i < classLabel.length; i++) {
@@ -156,6 +170,7 @@ public class KNearestNeighbor {
         break;
       }
     }
+    //System.out.println(truePositive);
     return new Goodness(truePositive, falsePositive, trueNegative, falseNegative);
   }
   
