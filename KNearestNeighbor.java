@@ -7,8 +7,8 @@ import java.io.*;
 
 public class KNearestNeighbor {
   
+  //Processes command line arguments, processes the data into useable data structures, and validates files
   public static ArrayList<Data> processData(String fileName, boolean test) throws IOException{
-    
     BufferedReader file;
     ArrayList<String> attributeNames = new ArrayList<String>();
     //Validate file
@@ -58,12 +58,13 @@ public class KNearestNeighbor {
       iD++;
       line = file.readLine();
     }
+    file.close();
     return allData;
   }
   
+  //Algorithm for kNearestNeighbor
   public static ArrayList<TestingData> kNearestNeighbor(ArrayList<TestingData> testingData, ArrayList<Data> trainingData, int k) {
     for (int i = 0; i < testingData.size(); i++) {
-      //System.out.println(i);
       TestingData current = testingData.get(i);
       HashMap<Integer, Double> smallestEuclideans = getSmallest(current.getEuclideans(), k);
       HashMap<Integer, Double> smallestManhattans = getSmallest(current.getManhattans(), k);
@@ -77,27 +78,23 @@ public class KNearestNeighbor {
     return testingData;
   }
   
+  //Finds the smallest k distances
   public static HashMap<Integer, Double> getSmallest(HashMap<Integer, Double> currentVals, int k) {
     HashMap<Integer, Double> returnVals = new HashMap<Integer, Double>();
     for (int i = 0; i < k; i++) {
-      //System.out.println(i);
       int small = 0;
       double smallValue = 0.0;
       for (int j = 1; j < currentVals.size(); j++) {
-        //System.out.println(j);
-        //System.out.println(!returnVals.containsKey(j));
         if (!returnVals.containsKey(j)) continue;
         if (currentVals.get(j) < currentVals.get(small)) {small = j; smallValue = currentVals.get(j);}
       }
       returnVals.put(small, smallValue);
-      //System.out.println(returnVals.toString());
-      //System.out.println(returnVals.containsKey(small));
       currentVals.remove(small);
     }
     return returnVals;
   }
     
-    
+  //Uses the smallest values and the training data to figure out the result of the "vote"
   public static String vote(HashMap<Integer, Double> smallestValues, ArrayList<Data> tData) {
     String classLabel1 = "";
     String classLabel2 = "";
@@ -115,47 +112,102 @@ public class KNearestNeighbor {
     return (yesVotes > noVotes) ? classLabel1 : classLabel2;
   }
   
-  public static ArrayList<Goodness> confusionMatrix(ArrayList<TestingData> testingData, String classLabel) {
-    ArrayList<Goodness> returnVals = new ArrayList<Goodness>();
-    returnVals.add(getConfusionMatrix(testingData, classLabel, 0));
-    returnVals.add(getConfusionMatrix(testingData, classLabel, 1));
-    returnVals.add(getConfusionMatrix(testingData, classLabel, 2));
-    returnVals.add(getConfusionMatrix(testingData, classLabel, 3));
-    
+  //
+  public static HashMap<String, HashMap<String, Goodness>> getGoodness(ArrayList<TestingData> testingData, String[] classLabel) {
+    HashMap<String, HashMap<String, Goodness>> returnVals = new HashMap<String, HashMap<String, Goodness>>();
+    for (int i = 0; i < classLabel.length; i++) {
+      HashMap<String, Goodness> results = new HashMap<String, Goodness>();
+      results.put("Euclidean", getConfusionMatrix(testingData, classLabel[i], 0));
+      results.put("Manhattan", getConfusionMatrix(testingData, classLabel[i], 1));
+      results.put("Chebyshev", getConfusionMatrix(testingData, classLabel[i], 2));
+      results.put("Cosine", getConfusionMatrix(testingData, classLabel[i], 3));
+      returnVals.put(classLabel[i], results);
+    }
     return returnVals;
   }
   
   public static Goodness getConfusionMatrix(ArrayList<TestingData> testingData, String classLabel, int index) {
-    int truePositive = 0;
-    int falseNegative = 0;
-    int trueNegative = 0;
-    int falsePositive = 0;
+    double truePositive = 0;
+    double falseNegative = 0;
+    double trueNegative = 0;
+    double falsePositive = 0;
     for (int i = 0; i < testingData.size(); i++) {
       TestingData current = testingData.get(i);
       switch (index) {
-        case 0: if (current.getPredictedEuclidean().equals(classLabel) && current.getPredictedEuclidean().equals(classLabel)) truePositive++;
-        else if (current.getPredictedEuclidean().equals(classLabel) && !current.getPredictedEuclidean().equals(classLabel)) falsePositive++;
-        else if (!current.getPredictedEuclidean().equals(classLabel) && !current.getPredictedEuclidean().equals(classLabel)) trueNegative++;
-        else if (!current.getPredictedEuclidean().equals(classLabel) && current.getPredictedEuclidean().equals(classLabel)) falseNegative++;
+        case 0: if (current.getPredictedEuclidean().equals(classLabel) && current.getPredictedEuclidean().equals(classLabel)) truePositive+=1;
+        else if (current.getPredictedEuclidean().equals(classLabel) && !current.getPredictedEuclidean().equals(classLabel)) falsePositive+=1;
+        else if (!current.getPredictedEuclidean().equals(classLabel) && !current.getPredictedEuclidean().equals(classLabel)) trueNegative+=1;
+        else if (!current.getPredictedEuclidean().equals(classLabel) && current.getPredictedEuclidean().equals(classLabel)) falseNegative+=1;
         break;
-        case 1: if (current.getPredictedManhattan().equals(classLabel) && current.getPredictedManhattan().equals(classLabel)) truePositive++;
-        else if (current.getPredictedManhattan().equals(classLabel) && !current.getPredictedManhattan().equals(classLabel)) falsePositive++;
-        else if (!current.getPredictedManhattan().equals(classLabel) && !current.getPredictedManhattan().equals(classLabel)) trueNegative++;
-        else if (!current.getPredictedManhattan().equals(classLabel) && current.getPredictedManhattan().equals(classLabel)) falseNegative++;
+        case 1: if (current.getPredictedManhattan().equals(classLabel) && current.getPredictedManhattan().equals(classLabel)) truePositive+=1;
+        else if (current.getPredictedManhattan().equals(classLabel) && !current.getPredictedManhattan().equals(classLabel)) falsePositive+=1;
+        else if (!current.getPredictedManhattan().equals(classLabel) && !current.getPredictedManhattan().equals(classLabel)) trueNegative+=1;
+        else if (!current.getPredictedManhattan().equals(classLabel) && current.getPredictedManhattan().equals(classLabel)) falseNegative+=1;
         break;
-        case 2: if (current.getPredictedChebyshev().equals(classLabel) && current.getPredictedChebyshev().equals(classLabel)) truePositive++;
-        else if (current.getPredictedChebyshev().equals(classLabel) && !current.getPredictedChebyshev().equals(classLabel)) falsePositive++;
-        else if (!current.getPredictedChebyshev().equals(classLabel) && !current.getPredictedChebyshev().equals(classLabel)) trueNegative++;
-        else if (!current.getPredictedChebyshev().equals(classLabel) && current.getPredictedChebyshev().equals(classLabel)) falseNegative++;
+        case 2: if (current.getPredictedChebyshev().equals(classLabel) && current.getPredictedChebyshev().equals(classLabel)) truePositive+=1;
+        else if (current.getPredictedChebyshev().equals(classLabel) && !current.getPredictedChebyshev().equals(classLabel)) falsePositive+=1;
+        else if (!current.getPredictedChebyshev().equals(classLabel) && !current.getPredictedChebyshev().equals(classLabel)) trueNegative+=1;
+        else if (!current.getPredictedChebyshev().equals(classLabel) && current.getPredictedChebyshev().equals(classLabel)) falseNegative+=1;
         break;
-        case 3: if (current.getPredictedCosine().equals(classLabel) && current.getPredictedCosine().equals(classLabel)) truePositive++;
-        else if (current.getPredictedCosine().equals(classLabel) && !current.getPredictedCosine().equals(classLabel)) falsePositive++;
-        else if (!current.getPredictedCosine().equals(classLabel) && !current.getPredictedCosine().equals(classLabel)) trueNegative++;
-        else if (!current.getPredictedCosine().equals(classLabel) && current.getPredictedCosine().equals(classLabel)) falseNegative++;
+        case 3: if (current.getPredictedCosine().equals(classLabel) && current.getPredictedCosine().equals(classLabel)) truePositive+=1;
+        else if (current.getPredictedCosine().equals(classLabel) && !current.getPredictedCosine().equals(classLabel)) falsePositive+=1;
+        else if (!current.getPredictedCosine().equals(classLabel) && !current.getPredictedCosine().equals(classLabel)) trueNegative+=1;
+        else if (!current.getPredictedCosine().equals(classLabel) && current.getPredictedCosine().equals(classLabel)) falseNegative+=1;
         break;
       }
     }
     return new Goodness(truePositive, falsePositive, trueNegative, falseNegative);
+  }
+  
+  public static String addToLine(HashMap<String, HashMap<String, Goodness>> values, String classLabel, String goodnessMeasure, String[] columnLabels) {
+    String line = "";
+    if (goodnessMeasure.equals("Precision")) {
+      for (int i = 0; i < columnLabels.length; i++) {
+        Goodness current = values.get(classLabel).get(columnLabels[i]);
+        line += current.getPrecision() + ", ";
+      }
+    }
+    else if (goodnessMeasure.equals("Recall")) {
+      for (int i = 0; i < columnLabels.length; i++) {
+        Goodness current = values.get(classLabel).get(columnLabels[i]);
+        line += current.getRecall() + ", ";
+      }
+    }
+    if (goodnessMeasure.equals("F1 Measures")) {
+      for (int i = 0; i < columnLabels.length; i++) {
+        Goodness current = values.get(classLabel).get(columnLabels[i]);
+        line += current.getPrecision() + ", ";
+      }
+    }
+    return line;
+  }
+  
+  public static void output(HashMap<String, HashMap<String, Goodness>> k3Values, HashMap<String, HashMap<String, Goodness>> k5Values, HashMap<String, HashMap<String, Goodness>> k7Values, HashMap<String, HashMap<String, Goodness>> k9Values, HashMap<String, HashMap<String, Goodness>> k11Values, String[] classLabels) throws IOException{
+    String filename = "";
+    for (int i = 0; i < classLabels.length; i++) {
+      filename += classLabels[i] + "_";
+    }
+    PrintWriter outFile = new PrintWriter(new FileWriter(filename + "results.csv"));
+    
+    for (int i = 0; i < classLabels.length; i++) {
+      String tableColumnLabels = "Euclidean, Chebyshev, Manhattan, Cosine Similarity";
+      String[] tableColumnLabel = {"Euclidean", "Chebyshev", "Manhattan", "Cosine"};
+      String[] goodnessMeasures = {"Precision", "Recall", "F1 Measures"};
+      for (int j = 0; j < goodnessMeasures.length; j++) {
+        outFile.println(classLabels[i] + " " + goodnessMeasures[j] + ", " + tableColumnLabels);
+        String line3 = "k=3, " + addToLine(k3Values, classLabels[i], goodnessMeasures[j], tableColumnLabel);
+        outFile.println(line3);
+        String line5 = "k=5, " + addToLine(k5Values, classLabels[i], goodnessMeasures[j], tableColumnLabel);
+        outFile.println(line5);
+        String line7 = "k=7, " + addToLine(k7Values, classLabels[i], goodnessMeasures[j], tableColumnLabel);
+        outFile.println(line7);
+        String line9 = "k=9, " + addToLine(k9Values, classLabels[i], goodnessMeasures[j], tableColumnLabel);
+        outFile.println(line9);
+        String line11 = "k=11, " + addToLine(k11Values, classLabels[i], goodnessMeasures[j], tableColumnLabel);
+        outFile.println(line11);
+      }
+    }
+    outFile.close();
   }
   
   public static void main(String[] args) throws IOException {
@@ -188,15 +240,15 @@ public class KNearestNeighbor {
     for (int i = 1; i < trainingData.size(); i++) {
       if (!trainingData.get(i).getClassLabel().equals(classLabels[0])) {classLabels[1] = trainingData.get(i).getClassLabel(); break;}
     }
-    ArrayList<Goodness> k3_1_Values = confusionMatrix(k3, classLabels[0]);
-    ArrayList<Goodness> k3_2_Values = confusionMatrix(k3, classLabels[1]);
-    ArrayList<Goodness> k5_1_Values = confusionMatrix(k5, classLabels[0]);
-    ArrayList<Goodness> k5_2_Values = confusionMatrix(k5, classLabels[1]);
-    ArrayList<Goodness> k7_1_Values = confusionMatrix(k7, classLabels[0]);
-    ArrayList<Goodness> k7_2_Values = confusionMatrix(k7, classLabels[1]);
-    ArrayList<Goodness> k9_1_Values = confusionMatrix(k9, classLabels[0]);
-    ArrayList<Goodness> k9_2_Values = confusionMatrix(k9, classLabels[1]);
-    ArrayList<Goodness> k11_1_Values = confusionMatrix(k11, classLabels[0]);
-    ArrayList<Goodness> k11_2_Values = confusionMatrix(k11, classLabels[1]);
+    HashMap<String, HashMap<String, Goodness>> k3Values = getGoodness(k3, classLabels);
+    HashMap<String, HashMap<String, Goodness>> k5Values = getGoodness(k5, classLabels);
+    HashMap<String, HashMap<String, Goodness>> k7Values = getGoodness(k7, classLabels);
+    HashMap<String, HashMap<String, Goodness>> k9Values = getGoodness(k9, classLabels);
+    HashMap<String, HashMap<String, Goodness>> k11Values = getGoodness(k11, classLabels);
+    System.out.println("Goodness Measures Computed");
+    
+    //System.out.println(k3Values.get(classLabels[0]).get("Euclidean").getPrecision());
+    output(k3Values, k5Values, k7Values, k9Values, k11Values, classLabels);
+    System.out.println("Finished");
   }
 }

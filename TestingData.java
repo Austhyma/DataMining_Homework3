@@ -5,6 +5,7 @@ import java.util.*;
 
 public class TestingData extends Data {
   
+  //Fields
   private String predictedEuclideanClass;
   private String predictedManhattanClass;
   private String predictedChebyshevClass;
@@ -15,10 +16,12 @@ public class TestingData extends Data {
   private HashMap<Integer, Double> cosines;
   private int arraysize;
   
+  //Constructor
   public TestingData(HashMap<String, Double> attributes, String classLabel, int iD) {
     super(attributes, classLabel, iD);
   }
   
+  //Getters and setters
   public void setEuclideanPrediction(String classLabel) {this.predictedEuclideanClass = classLabel;}
   public void setManhattanPrediction(String classLabel) {this.predictedManhattanClass = classLabel;}
   public void setChebyshevPrediction(String classLabel) {this.predictedChebyshevClass = classLabel;}
@@ -33,6 +36,11 @@ public class TestingData extends Data {
   public double getChebyshev(int index) {return this.chebyshevs.get(index);}
   public double getCosine(int index) {return this.cosines.get(index);}
   public void setArraySize(int size) {this.arraysize = size;}
+  public HashMap<Integer, Double> getEuclideans() {return this.euclideans;}
+  public HashMap<Integer, Double> getManhattans() {return this.manhattans;}
+  public HashMap<Integer, Double> getChebyshevs() {return this.chebyshevs;}
+  public HashMap<Integer, Double> getCosines() {return this.cosines;}
+  
   
   public void computeDistances(ArrayList<Data> trainingData, int size) {
     this.euclideans = new HashMap<Integer, Double>(size);
@@ -43,6 +51,7 @@ public class TestingData extends Data {
     
     for (Iterator<Data> curTrain = trainingData.iterator(); curTrain.hasNext();) {
       Data current = curTrain.next();
+      //Refactored calculations for clarification
       computeAll(current.getAttributes(), current.getID());
     }
   }
@@ -71,11 +80,7 @@ public class TestingData extends Data {
     cosines.put(index, cosineNumerator/(Math.sqrt(cosineDenominator1) * Math.sqrt(cosineDenominator2)));
   }
   
-  public HashMap<Integer, Double> getEuclideans() {return this.euclideans;}
-  public HashMap<Integer, Double> getManhattans() {return this.manhattans;}
-  public HashMap<Integer, Double> getChebyshevs() {return this.chebyshevs;}
-  public HashMap<Integer, Double> getCosines() {return this.cosines;}
-  
+  //A main function for testing purposes
   public static void main(String[] args) {
     String[] attNames = {"x", "y", "z"};
     ArrayList<Data> trainingData = new ArrayList<Data>();
