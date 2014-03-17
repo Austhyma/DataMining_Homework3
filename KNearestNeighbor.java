@@ -4,6 +4,7 @@
 
 import java.util.*;
 import java.io.*;
+import java.math.*;
 
 public class KNearestNeighbor {
   
@@ -100,31 +101,30 @@ public class KNearestNeighbor {
     
   //Uses the smallest values and the training data to figure out the result of the "vote"
   public static String vote(HashMap<Integer, Double> smallestValues, ArrayList<Data> tData) {
-    String classLabel1 = "";
+    String classLabel1 = tData.get(0).getClassLabel();
     String classLabel2 = "";
-    double yesVotes = 0;
-    double noVotes = 0;
+    BigDecimal yesVotes = new BigDecimal(0);
+    BigDecimal noVotes = new BigDecimal(0);
     Set<Integer> keys = smallestValues.keySet();
     for (Iterator<Integer> key = keys.iterator(); key.hasNext();) {
       int currentKey = key.next();
       for (int n = 0; n < tData.size(); n++) {
-        if (tData.get(n).getID() == smallestValues.get(currentKey)) {
-          if (classLabel1.equals("")) {
-            classLabel1 = tData.get(n).getClassLabel(); 
+        if (tData.get(n).getID() == currentKey) {
+          Double val = 1/Math.pow(smallestValues.get(currentKey), 2);
+          BigDecimal weightedVote;
+          if ((val == 0) || val == Double.POSITIVE_INFINITY) weightedVote = new BigDecimal(0);
+          else weightedVote = new BigDecimal(1/Math.pow(smallestValues.get(currentKey), 2));
+          if (tData.get(n).getClassLabel().equals(classLabel1)) {
+            yesVotes = yesVotes.add(weightedVote);
           }
-          if (tData.get(n).getClassLabel().equals(classLabel1)) yesVotes += (1/Math.pow(smallestValues.get(currentKey), 2));
           else {
-            classLabel2 = tData.get(n).getClassLabel(); 
-            noVotes += (1/Math.pow(smallestValues.get(currentKey), 2));
+            if (classLabel2.equals("")) classLabel2 = tData.get(n).getClassLabel();
+            noVotes = noVotes.add(weightedVote);
           }
         }
       }
     }
-    System.out.println(classLabel1);
-    System.out.println(classLabel2);
-    //System.out.println("yesVotes: " + yesVotes);
-    //System.out.println("noVotes: " + noVotes);
-    return (yesVotes > noVotes) ? classLabel1 : classLabel2;
+    return (yesVotes.compareTo(noVotes) == 1) ? classLabel1 : classLabel2;
   }
   
   public static HashMap<String, HashMap<String, Goodness>> getGoodness(ArrayList<TestingData> testingData, String[] classLabel) {
@@ -174,29 +174,6 @@ public class KNearestNeighbor {
     return new Goodness(truePositive, falsePositive, trueNegative, falseNegative);
   }
   
-  public static String addToLine(HashMap<String, HashMap<String, Goodness>> values, String classLabel, String goodnessMeasure, String[] columnLabels) {
-    String line = "";
-    if (goodnessMeasure.equals("Precision")) {
-      for (int i = 0; i < columnLabels.length; i++) {
-        Goodness current = values.get(classLabel).get(columnLabels[i]);
-        line += current.getPrecision() + ", ";
-      }
-    }
-    else if (goodnessMeasure.equals("Recall")) {
-      for (int i = 0; i < columnLabels.length; i++) {
-        Goodness current = values.get(classLabel).get(columnLabels[i]);
-        line += current.getRecall() + ", ";
-      }
-    }
-    if (goodnessMeasure.equals("F1 Measures")) {
-      for (int i = 0; i < columnLabels.length; i++) {
-        Goodness current = values.get(classLabel).get(columnLabels[i]);
-        line += current.getPrecision() + ", ";
-      }
-    }
-    return line;
-  }
-  
   public static void output(HashMap<String, HashMap<String, Goodness>> k3Values, HashMap<String, HashMap<String, Goodness>> k5Values, HashMap<String, HashMap<String, Goodness>> k7Values, HashMap<String, HashMap<String, Goodness>> k9Values, HashMap<String, HashMap<String, Goodness>> k11Values, String[] classLabels) throws IOException{
     String filename = "";
     for (int i = 0; i < classLabels.length; i++) {
@@ -223,6 +200,29 @@ public class KNearestNeighbor {
       }
     }
     outFile.close();
+  }
+  
+  public static String addToLine(HashMap<String, HashMap<String, Goodness>> values, String classLabel, String goodnessMeasure, String[] columnLabels) {
+    String line = "";
+    if (goodnessMeasure.equals("Precision")) {
+      for (int i = 0; i < columnLabels.length; i++) {
+        Goodness current = values.get(classLabel).get(columnLabels[i]);
+        line += current.getPrecision() + ", ";
+      }
+    }
+    else if (goodnessMeasure.equals("Recall")) {
+      for (int i = 0; i < columnLabels.length; i++) {
+        Goodness current = values.get(classLabel).get(columnLabels[i]);
+        line += current.getRecall() + ", ";
+      }
+    }
+    if (goodnessMeasure.equals("F1 Measures")) {
+      for (int i = 0; i < columnLabels.length; i++) {
+        Goodness current = values.get(classLabel).get(columnLabels[i]);
+        line += current.getPrecision() + ", ";
+      }
+    }
+    return line;
   }
   
   public static void main(String[] args) throws IOException {
