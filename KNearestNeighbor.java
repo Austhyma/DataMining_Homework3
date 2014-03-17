@@ -263,7 +263,7 @@ public class KNearestNeighbor {
     if (goodnessMeasure.equals("F1 Measures")) {
       for (int i = 0; i < columnLabels.length; i++) {
         Goodness current = values.get(classLabel).get(columnLabels[i]);
-        line += current.getPrecision() + ", ";
+        line += current.getF1() + ", ";
       }
     }
     return line;

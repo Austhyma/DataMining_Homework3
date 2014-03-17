@@ -1,5 +1,0 @@
-Compile KNearestNeighbor, and then type:
-
-	java KNearestNeighbor <trainingFile> <testingFile>
-
-to run the file in the command line
