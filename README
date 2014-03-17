@@ -1,0 +1,9 @@
+DataMining_Homework3
+====================
+
+In order to run this program, you must first put your .arff training and testing files inside this directory. Then to compute, type these commands into the command line:
+
+  javac KNearestNeighbor.java
+  java KNearestNeighbor <trainingFileName> <testingFileName>
+  
+The output will be in the form of a .csv formatted as such: "<ClassLabel1>_<ClassLabel2>_restuls.csv"
