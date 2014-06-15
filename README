@@ -3,6 +3,7 @@ DataMining_Homework3
 This project implements the K-nearest-neighbors algorithm used in data-mining. It takes in two .arff files; one for testing, and one for training.
 It then assigns a class label to the testing-sample based on a weighted vote of the nearest testing samples' class labels. 
 The algorithm uses the Euclidean and Manhattan metrics for distance.
+After assigning the class label, the prediction is measured against the actual class label through a number of different goodness metrics: accuracy, precision, recall and an F-1 mean.
 ====================
 
 In order to run this program, you must first put your .arff training and testing files inside this directory. Then to compute, type these commands into the command line:
